@@ -1,66 +1,33 @@
 import requests
-import time
-from datetime import datetime
+import pymysql
+import os
+from dotenv import load_dotenv
 
-start_time = time.time()
-print(f"\nWaktu mulai : {datetime.now()}\n")
+load_dotenv()
 
-url = "https://indodax.com/api/tickers"
+def get_data():
+    data = requests.get("https://indodax.com/api/tickers").json()["tickers"]
+    return [
+        (pair, int(v["server_time"]), float(v["low"]), float(v["high"]), float(v["last"]))
+        for pair, v in data.items()
+    ]
 
-request_start = time.time()
-response = requests.get(url)
-latency = time.time() - request_start
+conn = pymysql.connect(
+    host=os.environ["MYSQL_HOST"],
+    port=int(os.environ["MYSQL_PORT"]),
+    user=os.environ["MYSQL_USER"],
+    password=os.environ["MYSQL_PASSWORD"],
+    database=os.environ["MYSQL_DB"],
+    autocommit=False
+)
 
-data = response.json()["tickers"]
+def insert_data():
+    with conn.cursor() as cursor:
+        insert_sql = """
+          INSERT INTO tickers_indodax (pair, server_time, low, high, last)
+          VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.executemany(insert_sql, get_data())
+        conn.commit()
 
-rows = []
-
-header = [
-    "no",
-    "pair",
-    "server_time",
-    "buy",
-    "sell",
-    "low",
-    "high",
-    "last",
-    "vol_coin",
-    "vol_idr"
-]
-
-rows.append(header)
-
-for i, (pair, v) in enumerate(data.items(), 1):
-
-    coin = pair.split("_")[0]
-    vol_key = f"vol_{coin}"
-    vol_idr = int(float(v.get("vol_idr", 0)))
-
-    # ---- FORMAT vol_coin ----
-    raw_vol = v.get(vol_key)
-    if raw_vol is not None:
-        vol_coin = ('%.10f' % float(raw_vol)).rstrip('0').rstrip('.')
-    else:
-        vol_coin = "-"
-
-    rows.append([
-        i,
-        pair,
-        v.get("server_time"),
-        v.get("buy"),
-        v.get("sell"),
-        v.get("low"),
-        v.get("high"),
-        v.get("last"),
-        vol_coin,
-        vol_idr
-    ])
-
-widths = [max(len(str(row[i])) for row in rows) for i in range(len(rows[0]))]
-
-for row in rows:
-    print("  ".join(str(val).ljust(widths[i]) for i, val in enumerate(row)))
-
-print(f"\nLatency API : {latency:.4f} detik")
-print(f"Total runtime : {time.time() - start_time:.4f} detik\n")
-
+insert_data()
