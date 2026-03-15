@@ -1,0 +1,32 @@
+[Unit]
+Description=Pemograman Kripto — FastAPI + asyncpg + ETL Indodax
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=farisalfatih
+WorkingDirectory=/opt/pemograman-kripto
+
+ExecStart=/opt/pemograman-kripto/venv/bin/uvicorn app:app \
+          --host 0.0.0.0 \
+          --port 8000 \
+          --workers 1 \
+          --loop asyncio \
+          --no-access-log
+
+# Restart hanya jika proses crash, bukan saat stop manual
+Restart=on-failure
+RestartSec=10
+
+# Matikan semua child process saat stop
+KillMode=control-group
+TimeoutStopSec=15
+
+EnvironmentFile=/opt/pemograman-kripto/.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pemograman-kripto
+
+[Install]
+WantedBy=multi-user.target
