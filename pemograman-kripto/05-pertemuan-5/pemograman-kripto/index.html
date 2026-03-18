@@ -5,19 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="no-referrer" />
   <title>Pemograman Kripto</title>
-
-  <!-- Preconnect CDN agar lebih cepat -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- CSS -->
   <link rel="stylesheet" href="/static/styles.css" />
-
 </head>
 <body>
 
-<!-- ══════════════ DASHBOARD ══════════════ -->
 <div id="page-dash">
 
   <!-- Topbar -->
@@ -36,13 +30,13 @@
     </div>
   </header>
 
-  <!-- Pair tabs + Day selector dalam 1 bar -->
+  <!-- Nav: pair tabs + day selector -->
   <nav class="nav-bar">
     <div class="pair-tabs" id="pair-tabs"></div>
     <div class="day-selector" id="day-selector"></div>
   </nav>
 
-  <!-- Main content -->
+  <!-- Main -->
   <main class="dash-body">
 
     <!-- Toolbar -->
@@ -81,7 +75,7 @@
       </div>
     </div>
 
-    <!-- Charts -->
+    <!-- Charts baris 1: Price + RSI -->
     <div class="charts-grid">
       <div class="chart-card chart-full">
         <div class="chart-hdr">
@@ -103,6 +97,18 @@
           <span class="chart-badge">SMA 20</span>
         </div>
         <div class="chart-wrap"><canvas id="chartBb"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Chart baris 2: Combined RSI + BB (full width) -->
+    <div class="charts-grid" style="margin-top:.7rem">
+      <div class="chart-card chart-full">
+        <div class="chart-hdr">
+          <span class="chart-title">Combined — Harga + BB + RSI</span>
+          <span class="chart-badge" style="background:rgba(255,184,108,.12);color:#ffb86c;border-color:rgba(255,184,108,.3)">Dual Axis</span>
+        </div>
+        <!-- Lebih tinggi agar dual-axis mudah dibaca -->
+        <div class="chart-wrap" style="height:260px"><canvas id="chartCombined"></canvas></div>
       </div>
     </div>
 
@@ -135,10 +141,9 @@
   <div class="loader-txt" id="loader-txt">Memuat…</div>
 </div>
 
-<!-- Toast container -->
+<!-- Toast -->
 <div id="toasts" role="status" aria-live="polite"></div>
 
-<!-- CDN dimuat duluan, script.js terakhir -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="/static/script.js"></script>
 </body>
